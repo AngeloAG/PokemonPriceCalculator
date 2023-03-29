@@ -7,11 +7,15 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from bs4 import BeautifulSoup
 
 AAAG_DRIVER_SERVICE = Service(executable_path="/drivers/chromedriver.exe")
-AAAG_DRIVER = webdriver.Chrome(service=AAAG_DRIVER_SERVICE)
+AAAG_DRIVER_OPTIONS = Options()
+AAAG_DRIVER_OPTIONS.headless = True
+AAAG_DRIVER = webdriver.Chrome(
+    service=AAAG_DRIVER_SERVICE, options=AAAG_DRIVER_OPTIONS)
 
 
 def aaag_get_html_until_element_present(aaag_url, aaag_identification_type, aaag_identification_value):
@@ -27,10 +31,10 @@ def aaag_get_html_until_element_present(aaag_url, aaag_identification_type, aaag
         AAAG_DRIVER.get(aaag_url)
         # Searches usually do delayed request after page loads, we have to wait for a certain element to appear in the DOM
         if aaag_identification_type == "class":
-            WebDriverWait(AAAG_DRIVER, 5).until(
+            WebDriverWait(AAAG_DRIVER, 6).until(
                 EC.presence_of_element_located((By.CLASS_NAME, aaag_identification_value)))
         elif aaag_identification_type == "id":
-            WebDriverWait(AAAG_DRIVER, 5).until(
+            WebDriverWait(AAAG_DRIVER, 6).until(
                 EC.presence_of_element_located((By.ID, aaag_identification_value)))
         else:
             raise ValueError("Bad invalid aaag_identification_type")
@@ -56,6 +60,19 @@ def aaag_get_element_from_soup(aaag_soup, aaag_identification_type, aaag_identif
     """
     aaag_element = aaag_soup.find(
         attrs={aaag_identification_type: aaag_identification_value})
+
+    return aaag_element
+
+
+def aaag_get_element_from_soup_by_element(aaag_soup, aaag_element):
+    """Gets first appearance of an element from a BeautifulSoup instance by its type
+      Args:
+        @aaag_soup (BeautifulSoup): the soup in which to find the element
+        @aaag_identification_type (str): the type of element (i.e. p, h1, title, img, a)
+      Returns:
+        The soup element if found, if not returns None
+    """
+    aaag_element = aaag_soup.find(aaag_element)
 
     return aaag_element
 

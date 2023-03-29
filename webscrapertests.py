@@ -7,7 +7,7 @@ from webscraper import *
 from bs4 import BeautifulSoup
 
 
-def ntest_aaag_get_html_until_element_present():
+def test_aaag_get_html_until_element_present():
     """Tests the functionality of the function to get the html from a webpage
     Args: None
     Returns: Nothing
@@ -15,7 +15,7 @@ def ntest_aaag_get_html_until_element_present():
     # Ensuring it opens web pages correctly ------------------------
     aaag_google_url = "https://google.com"
     aaag_soup = aaag_get_html_until_element_present(
-        aaag_google_url, "id", "hplogo")
+        aaag_google_url, "class", "RNNXgb")
 
     # ensure the soup has an html tag
     assert aaag_soup.find("html"), "The returned element contains no HTML"
