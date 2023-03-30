@@ -1,6 +1,7 @@
 # Author: Angelo Arellano Gaona
 # Description:
 #   This module has all the helper functions for webscraping. It works using Selenium for browser controlling and BeautifulSoup for html elements manipulation
+# Date: 3/30/2023
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service

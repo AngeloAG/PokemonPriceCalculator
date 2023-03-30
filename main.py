@@ -1,12 +1,17 @@
 # Author: Angelo Arellano Gaona
-# Description: This program uses Selenium to scrap web pages and get prices for pokemon cards based on the user search
+# Description: This program uses Selenium to scrap web pages and get prices for pokemon cards based on the user search, all is displayed in a GUI made in tkinter
+# Date: 3/30/2023
 
-# from webscraper import aaag_get_html_until_element_present_byclass
+# IMPORTANT! Run " pip install -r requirements.txt " before running this program
+# This program uses Selenium, BeautifulSoup and other packages that need to be installed for it to work properly
+# After that, you can run the program via VSCODE or by " python main.py " in the terminal
+# A window will appear, use the search bar and type a pokemon you want to search cards for and click on "search", if you want to save the results click on "search and save".
+
 import webscraper as scraper
 import json
 from datetime import datetime
 import tkinter as tk
-from tkinter import Frame, Label, Button, Text, END, E, W, Scrollbar, Canvas
+from tkinter import Frame, Label, Button, Text, END, W, Scrollbar, Canvas
 import webbrowser
 
 DEBUG = True
@@ -14,13 +19,11 @@ DEBUG = True
 
 
 def main():
-   # Create the Tk root object.
+    # Create the Tk root object.
     aaag_root = tk.Tk()
     aaag_root.geometry('700x350')
-    # aaag_root.resizable(False, False)
 
-    # Create the main window. In tkinter,
-    # a window is also called a frame.
+    # Create the main window.
     aaag_frm_main = Frame(aaag_root)
     aaag_frm_main.master.title("Pokemon Price Calculator")
     aaag_frm_main.pack(padx=4, pady=3, fill=tk.BOTH, expand=0)
@@ -37,19 +40,20 @@ def main():
 
 
 def aaag_populate_main_window(aaag_frame, aaag_results_frame):
-    """Populate the main window of this program. In other words, put
-      the labels, text entry boxes, and buttons into the main window.
-
+    """Puts all the GUI elements for the window and binds the buttons to the actions that will populate the results of the search
       Parameter
-          frm_main: the main frame (window)
+          aaag_frame: the frame for the search elements
+          aaag_results_frame: the frame that will hold the results of a search
       Return: nothing
       """
+    # Search bar elements
     aaag_header_lbl = Label(
         aaag_frame, text='Card name (i.e. Charizard):', justify="left", anchor="w")
     aaag_searchbar_ent = Text(aaag_frame, height=1, width=30)
     aaag_search_btn = Button(aaag_frame, text='Search',
                              width=10)
     aaag_save_btn = Button(aaag_frame, text='Search and Save Results')
+    # This label is used to display informational messages to the user
     aaag_action_lbl = Label(
         aaag_frame, text="", justify="left", anchor="w")
 
@@ -62,8 +66,9 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
     aaag_debug("Basic elements populated successfully")
 
     def aaag_save():
-        """Function to seach and save the search results to file"""
+        """Function to search and save the search results to file. It shows the name of the savefile to the user on the GUI"""
         aaag_search_term = aaag_searchbar_ent.get("1.0", END)
+        aaag_search_term = aaag_search_term.strip()
         aaag_action_lbl.grid_forget()
 
         if aaag_search_term != "":
@@ -88,8 +93,9 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
             aaag_frame.update()
 
     def aaag_search():
-        """Performs the search of the value in the searchbar"""
+        """Performs the search of the value in the searchbar and calls the function to put them on the GUI"""
         aaag_search_term = aaag_searchbar_ent.get("1.0", END)
+        aaag_search_term = aaag_search_term.strip()
         aaag_action_lbl.grid_forget()
 
         if aaag_search_term != "":
@@ -107,7 +113,7 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
             aaag_populate_results(aaag_results)
 
     def aaag_populate_results(aaag_results):
-        """Populates the results on the frame"""
+        """Populates the results of a search on the results frame. Usually called by the aaag_search function"""
 
         # Creating a canvas and scrollbar for the results
         aaag_canvas = Canvas(aaag_results_frame)
@@ -132,6 +138,7 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
         # Setting the scrollbar behavior to the scroll on y axis command of the canvas
         aaag_canvas.configure(yscrollcommand=aaag_scrollbar.set)
 
+        # Iterating through the results and building the GUI elements to be added to the frame
         aaag_row_idx = 0
         for result in aaag_results:
             aaag_card_name_lbl = Label(
@@ -181,7 +188,7 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
 
 
 def aaag_save_results(aaag_results):
-    """Function to save the results of a search to a json file
+    """Function to save the results of a search to a json file, it saves it in the same folder the code is being executed
      Args:
          @aaag_message (list): The results to save
        Returns:
@@ -215,7 +222,7 @@ def aaag_get_cards_information(aaag_card_name):
             'site': 'tcgplayer',
             'base_url': 'https://www.tcgplayer.com',
             'search_url': 'https://www.tcgplayer.com/search/all/product?q=',
-            'results_limit': 2,
+            'results_limit': 5,
             'anchor_element': {
                 'identifier_value': 'search-results',
                 'identifier_type': 'class'
@@ -254,7 +261,7 @@ def aaag_get_cards_information(aaag_card_name):
             'site': 'trollandtoad',
             'base_url': 'https://www.trollandtoad.com',
             'search_url': 'https://www.trollandtoad.com/category.php?selected-cat=0&view=grid&search-words=',
-            'results_limit': 2,
+            'results_limit': 5,
             'anchor_element': {
                 'identifier_value': 'product-col',
                 'identifier_type': 'class'
@@ -290,73 +297,86 @@ def aaag_get_cards_information(aaag_card_name):
             }
         },
     ]
+
     aaag_results = []
     for page in AAAG_PAGES:
-        aaag_url = page['search_url'] + aaag_card_name
+        aaag_url = page['search_url'] + aaag_card_name + "%20pokemon"
         aaag_debug(aaag_url)
 
         # Getting main soup
         aaag_soup = scraper.aaag_get_html_until_element_present(
             aaag_url, page['anchor_element']['identifier_type'], page['anchor_element']['identifier_value'])
-        aaag_results_container_soup = scraper.aaag_get_element_from_soup(
-            aaag_soup, page['results_container']['identifier_type'], page['results_container']['identifier_value'])
-        aaag_results_soups = scraper.aaag_get_elements_from_soup_all(
-            aaag_results_container_soup, page['result_card']['identifier_type'], page['result_card']['identifier_value'])
+        aaag_soup_title_element = scraper.aaag_get_element_from_soup_by_element(
+            aaag_soup, "title")
+        aaag_soup_title = scraper.aaag_get_text_from_element(
+            aaag_soup_title_element)
 
-        # In case the results are less than the normal expected results
-        aaag_results_amount = len(aaag_results_soups) if (
-            len(aaag_results_soups) < page['results_limit']) else page['results_limit']
-        aaag_debug(f"Results amount: {aaag_results_amount}")
+        aaag_debug(f"Soup title: {aaag_soup_title}")
 
-        for idx in range(0, aaag_results_amount):
-            aaag_result = {}
-            result_card = aaag_results_soups[idx]
+        if aaag_soup_title != "Not found":
+            aaag_results_container_soup = scraper.aaag_get_element_from_soup(
+                aaag_soup, page['results_container']['identifier_type'], page['results_container']['identifier_value'])
+            aaag_results_soups = scraper.aaag_get_elements_from_soup_all(
+                aaag_results_container_soup, page['result_card']['identifier_type'], page['result_card']['identifier_value'])
 
-            # Getting the name of the card
-            aaag_result_name_soup = scraper.aaag_get_element_from_soup(
-                result_card, page['result_name']['identifier_type'], page['result_name']['identifier_value'])
-            aaag_result['card_name'] = scraper.aaag_get_text_from_element(
-                aaag_result_name_soup)
+            # In case the results are less than the normal expected results
+            aaag_results_amount = len(aaag_results_soups) if (
+                len(aaag_results_soups) < page['results_limit']) else page['results_limit']
+            aaag_debug(f"Results amount: {aaag_results_amount}")
 
-            aaag_debug(f"Card Name: {aaag_result['card_name']}")
+            for idx in range(0, aaag_results_amount):
+                aaag_result = {}
+                result_card = aaag_results_soups[idx]
 
-            # Getting the card img url
-            aaag_result_img_soup = scraper.aaag_get_element_from_soup(
-                result_card, page['result_img']['identifier_type'], page['result_img']['identifier_value'])
-            aaag_result['card_img'] = scraper.aaag_get_element_attribute(
-                aaag_result_img_soup, page['result_img']['attribute'])
+                # Getting the name of the card
+                aaag_result_name_soup = scraper.aaag_get_element_from_soup(
+                    result_card, page['result_name']['identifier_type'], page['result_name']['identifier_value'])
+                aaag_result['card_name'] = scraper.aaag_get_text_from_element(
+                    aaag_result_name_soup)
 
-            aaag_debug(f"Card Img: {aaag_result['card_img']}")
+                aaag_debug(f"Card Name: {aaag_result['card_name']}")
 
-            # Getting the card price
-            aaag_result_price_soup = scraper.aaag_get_element_from_soup(
-                result_card, page['result_price']['identifier_type'], page['result_price']['identifier_value'])
-            aaag_result['card_price'] = scraper.aaag_get_text_from_element(
-                aaag_result_price_soup)
+                # Getting the card img url
+                aaag_result_img_soup = scraper.aaag_get_element_from_soup(
+                    result_card, page['result_img']['identifier_type'], page['result_img']['identifier_value'])
+                aaag_result['card_img'] = scraper.aaag_get_element_attribute(
+                    aaag_result_img_soup, page['result_img']['attribute'])
 
-            aaag_debug(f"Card Price: {aaag_result['card_price']}")
+                aaag_debug(f"Card Img: {aaag_result['card_img']}")
 
-            # Getting card expansion
-            aaag_result_expansion_soup = scraper.aaag_get_element_from_soup(
-                result_card, page['result_expansion']['identifier_type'], page['result_expansion']['identifier_value'])
-            aaag_result['card_expansion'] = scraper.aaag_get_text_from_element(
-                aaag_result_expansion_soup)
+                # Getting the card price
+                aaag_result_price_soup = scraper.aaag_get_element_from_soup(
+                    result_card, page['result_price']['identifier_type'], page['result_price']['identifier_value'])
+                if aaag_result_price_soup is None:
+                    aaag_result['card_price'] = 'Not provided'
+                else:
+                    aaag_result['card_price'] = scraper.aaag_get_text_from_element(
+                        aaag_result_price_soup)
 
-            aaag_debug(f"Card Expansion: {aaag_result['card_expansion']}")
+                aaag_debug(f"Card Price: {aaag_result['card_price']}")
 
-            # Getting card hyperlink to website page
-            aaag_result_hyperlink_soup = scraper.aaag_get_element_from_soup_by_element(
-                result_card, page['result_hyperlink']['element_type'])
+                # Getting card expansion
+                aaag_result_expansion_soup = scraper.aaag_get_element_from_soup(
+                    result_card, page['result_expansion']['identifier_type'], page['result_expansion']['identifier_value'])
+                aaag_result['card_expansion'] = scraper.aaag_get_text_from_element(
+                    aaag_result_expansion_soup)
 
-            aaag_card_hyperlink = scraper.aaag_get_element_attribute(
-                aaag_result_hyperlink_soup, page['result_hyperlink']['attribute'])
+                aaag_debug(f"Card Expansion: {aaag_result['card_expansion']}")
 
-            aaag_result['card_hyperlink'] = page['base_url'] + \
-                aaag_card_hyperlink
+                # Getting card hyperlink to website page
+                aaag_result_hyperlink_soup = scraper.aaag_get_element_from_soup_by_element(
+                    result_card, page['result_hyperlink']['element_type'])
 
-            aaag_debug(f"Card Hyperlink: {aaag_result['card_hyperlink']}")
+                aaag_card_hyperlink = scraper.aaag_get_element_attribute(
+                    aaag_result_hyperlink_soup, page['result_hyperlink']['attribute'])
 
-            aaag_results.append(aaag_result)
+                # This converts the subaddress of the link into a real url
+                aaag_result['card_hyperlink'] = page['base_url'] + \
+                    aaag_card_hyperlink
+
+                aaag_debug(f"Card Hyperlink: {aaag_result['card_hyperlink']}")
+
+                aaag_results.append(aaag_result)
     return aaag_results
 
 
