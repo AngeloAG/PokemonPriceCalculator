@@ -115,6 +115,10 @@ def aaag_populate_main_window(aaag_frame, aaag_results_frame):
     def aaag_populate_results(aaag_results):
         """Populates the results of a search on the results frame. Usually called by the aaag_search function"""
 
+        # Removing any result from previous searches
+        for aaag_element in aaag_results_frame.winfo_children():
+            aaag_element.destroy()
+
         # Creating a canvas and scrollbar for the results
         aaag_canvas = Canvas(aaag_results_frame)
         aaag_scrollbar = Scrollbar(
