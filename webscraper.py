@@ -12,11 +12,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from bs4 import BeautifulSoup
 
-AAAG_DRIVER_SERVICE = Service(executable_path="/drivers/chromedriver.exe")
+#AAAG_DRIVER_SERVICE = Service(executable_path="/drivers/chromedriver.exe")
 AAAG_DRIVER_OPTIONS = Options()
 AAAG_DRIVER_OPTIONS.headless = True
-AAAG_DRIVER = webdriver.Chrome(
-    service=AAAG_DRIVER_SERVICE, options=AAAG_DRIVER_OPTIONS)
+AAAG_DRIVER = webdriver.Chrome( options=AAAG_DRIVER_OPTIONS)
 
 
 def aaag_get_html_until_element_present(aaag_url, aaag_identification_type, aaag_identification_value):
